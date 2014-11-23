@@ -5,27 +5,75 @@
 //     expect(rf[2]).toEqual(0.25);
 //   })
 // })
-// describe("find starting digit for histogram", function() {
-//   it("small set of histogram data", function() {
-//     var histogramData = findHistogramData(20, [17.8,60,92.7,12.5,100]);
-//     expect(histogramData).toEqual({bars:8, start:59.95, end:100});
+// describe("generate histogram data", function() {
+//   it("generate correct data", function() {
+//     var sortedData = [40, 40, 60, 60, 80, 80, 100, 100];
+//     var largestNumber = 100;
+//     var startingNumber = 39.5;
+//     var bars = 5;
+//     // var barWidth = _generateHistogramData(sortedData, startingNumber, largestNumber, bars);
+//     // expect(barWidth).toEqual(10);
 //   })
 // })
-describe("find starting number for histogram", function() {
-  it("return 1.5", function() {
-    var largestNumber = 71.55;
-    var startingNumber = 59.95;
-    var bars = 8;
-    var histogramEndNumber = _generateHistogramData(largestNumber, startingNumber, bars);
-    expect(histogramEndNumber).toEqual(1.5);
+describe("histogram data", function() {
+  it("small set of histogram data", function() {
+    var histogramData = calcHistogramData(20, [47,51,54.2,64,92.7,12.5,100,17.8,23,27,31,31.6,36]);
+    expect(histogramData.numberOfBars).toEqual(20);
+    expect(histogramData.barWidth).toEqual(11);
+    expect(histogramData.start).toEqual(12.0);
+    expect(histogramData.end).toEqual(100);
+    expect(histogramData.data[0]).toEqual({start: 12.5, end: 23.5, value: 2});
+    expect(histogramData.data[1]).toEqual({start: 23.5, end: 34.5, value: 3});
+    expect(histogramData.data[2]).toEqual({start: 34.5, end: 45.5, value: 1});
+    expect(histogramData.data[3]).toEqual({start: 45.5, end: 56.5, value: 3});
+    expect(histogramData.data[4]).toEqual({start: 56.5, end: 67.5, value: 1});
+    expect(histogramData.data[5]).toEqual({start: 67.5, end: 78.5, value: 0});
+    expect(histogramData.data[6]).toEqual({start: 78.5, end: 89.5, value: 0});
+    expect(histogramData.data[7]).toEqual({start: 89.5, end: 100.5, value: 1});
+    expect(histogramData.data[8]).toEqual({start: 100.5, end: 111.5, value: 0});    
   })
-it("return 1.5", function() {
-  var largestNumber = 119.70;
-  var startingNumber = 59.95;
-  var bars = 12;
-  var histogramEndNumber = _generateHistogramData(largestNumber, startingNumber, bars);
-  expect(histogramEndNumber).toEqual(7.5);
 })
+describe("histogram get ordered data", function() {
+  it("return bardata", function() {
+    var sortedData = [40, 45, 57, 63, 69, 86, 93, 100, 101, 103 ];
+    var start = 39.95;
+    var end   = 93.2;
+    var numberOfBars = 6;
+    var barWidth = 20;
+    var barData = _generateHistogramData(sortedData, start, end, numberOfBars, barWidth);
+    expect(barData).toEqual([
+      { start : 39.95, end : 59.95, value : 3 },
+      { start : 59.95, end : 79.95, value : 2 },
+      { start : 79.95, end : 99.95, value : 2 },
+      { start : 99.95, end : 119.95, value : 3 }
+      ]);
+
+  })
+})
+describe("histogram get bars", function() {
+  it("return bardata", function() {
+    var start = 39.5;
+    var end   = 86;
+    var bars = 10;
+    var barData = _getHistogramBars(start, end, bars);
+    expect(barData).toEqual([ 39.5, 49.5, 59.5, 69.5, 79.5, 89.5 ]);
+  })
+})
+describe("find absolute bar width", function() {
+  it("return 10", function() {
+    var largestNumber = 100;
+    var startingNumber = 20;
+    var bars = 8;
+    var barWidth = _calcHistogramBarWidth(startingNumber, largestNumber, bars);
+    expect(barWidth).toEqual(10);
+  })
+  it("return 10", function() {
+    var largestNumber = 127.5;
+    var startingNumber = 13;
+    var bars = 10;
+    var barWidth = _calcHistogramBarWidth(startingNumber, largestNumber, bars);
+    expect(barWidth).toEqual(14.4);
+  })
 })
 describe("get histogram range", function() {
 it("small set", function() {
@@ -73,6 +121,10 @@ describe("find smallest number in set", function() {
   it("find smallest number inset", function() {
     var smallest = _findSmallestNumber([62.8,59.5,92.8]);
     expect(smallest).toEqual(59.5);
+  })
+  it("find smallest number in set", function() {
+    var smallest = _findSmallestNumber([47,51,54.2,64,92.7,12.5,100,17.8,23,27,31,31.6,36]);
+    expect(smallest).toEqual(12.5);
   })
 })
 describe("calculate relative frequency from frequency table", function() {

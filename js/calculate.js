@@ -1,14 +1,51 @@
-function findHistogramData(bars, rawData) {
-  var sortedData = rawData.sort();
+function calcHistogramData(numberOfBars, rawData) {
+  var sortedData = rawData.sort(function(a, b){return a-b});
+  // find starting number digit
   var significantDigit = _findSignificantDigitLength(sortedData);
   var smallestNumber = _findSmallestNumber(sortedData);
   var startingNumber = _findHistogramStartingNumber(smallestNumber, significantDigit);
+  // get largest number
   var largestNumber = _findLargestNumber(sortedData);
-  var histogramData = _generateHistogramData(smallestNumber, largestNumber, bars)
-  return {bars:20, start:59.95, end:100};
+  var barWidth = _calcHistogramBarWidth(smallestNumber, largestNumber, numberOfBars);
+  var histogramData = _generateHistogramData(sortedData, smallestNumber, largestNumber, numberOfBars, barWidth)
+  return {
+    numberOfBars: numberOfBars,
+    barWidth: barWidth, 
+    start: startingNumber,
+    end: largestNumber,
+    data : histogramData
+  };
 }
 
-function _generateHistogramData(largestNumber, smallestNumber, bars) {
+function _generateHistogramData(sortedData, smallestNumber, largestNumber, numberOfBars, barWidth) {
+  var bars = _getHistogramBars(smallestNumber, largestNumber, barWidth);
+  var data = [];
+  for (var b=0;b<bars.length;b++) {
+    var lowThreshold = bars[b];
+    var highThreshold = bars[b]+barWidth;
+    var count = 0;
+    for (var n in sortedData) {
+      if (lowThreshold <= sortedData[n] && sortedData[n] <= highThreshold) {
+        count++;
+      }
+    }
+    data.push({start: lowThreshold, end: highThreshold, value: count});
+  }
+  return data;
+}
+
+function _getHistogramBars(smallestNumber, largestNumber, barWidth) {
+  var bars = [];
+  bars.push(smallestNumber);
+  var stepper = smallestNumber;
+  while (stepper <= largestNumber) {
+    stepper += barWidth;
+    bars.push(stepper);
+  }
+  return bars;
+}
+
+function _calcHistogramBarWidth(smallestNumber, largestNumber, bars) {
   var interval = (largestNumber - smallestNumber) / 8;
   return Math.ceil(interval*10)/10;
 }
@@ -33,7 +70,7 @@ function _findSignificantDigitLength(sortedData) {
   return digitFound
 }
 function _findSmallestNumber(sortedSet) {
-  sortedSet.sort();
+  sortedSet.sort(function(a, b){return a-b});
   return sortedSet.shift();
   // var smallest = null;
   // for(var n=0;n<set.length;n++) {
@@ -44,7 +81,7 @@ function _findSmallestNumber(sortedSet) {
   // return smallest;
 }
 function _findLargestNumber(sortedSet) {
-  sortedSet.sort();
+  sortedSet.sort(function(a, b){return a-b});
   return sortedSet.pop();
   // var largest = null;
   // for(var n=0;n<set.length;n++) {
